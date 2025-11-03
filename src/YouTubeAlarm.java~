@@ -1,0 +1,43 @@
+ds audio from YouTube using yt-dlp
+         */
+    private static boolean downloadAudio(String url, String outputFilename) {
+    try {
+	ProcessBuilder pb = new ProcessBuilder(
+					       "yt-dlp",
+					       "-x",                            // extract audio
+					       "--audio-format", "wav",         // convert to WAV
+					       "-o", outputFilename,            // output filename
+					                           url
+					       );
+	pb.inheritIO(); // Optional: shows yt-dlp output in console
+	Process process = pb.start();
+	int exitCode = process.waitFor();
+
+	return exitCode == 0 && Files.exists(Paths.get(outputFilename));
+    } catch (IOException | InterruptedException e) {
+	e.printStackTrace();
+	return false;
+    }
+}
+
+/**
+ * Plays a WAV audio file
+ */
+private static void playAudio(String filepath) {
+    try {
+	File audioFile = new File(filepath);
+	AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+
+	Clip clip = AudioSystem.getClip();
+	clip.open(audioStream);
+	clip.start();
+
+	// Keep program running until audio finishes
+	Thread.sleep(clip.getMicrosecondLength() / 1000);
+    } catch (Exception e) {
+	e.printStackTrace();
+    }
+}
+
+}
+~
